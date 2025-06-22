@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GamerMaxx Online</title>
+    <style>
+        body {
+            background-color: #e60012;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .controller-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .menu-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 700px;
+        }
+
+        .menu-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-item.selected {
+            background-color: #ffffff;
+            color: #e60012;
+            transform: scale(1.05);
+        }
+
+        .game-library {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 900px;
+            z-index: 100;
+        }
+
+        .game-library .menu-item.selected {
+            background-color: #ffffff;
+            color: #e60012;
+            transform: scale(1.05);
+        }
+
+        .game-screen {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: black;
+            padding: 0;
+            border-radius: 0;
+            z-index: 200;
+            width: 95%;
+            height: 90%;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e60012;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .beta-label {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 900px;
+            z-index: 300;
+        }
+
+        .modal h2 {
+            margin-top: 0;
+        }
+
+        .modal p {
+            font-size: 1.2rem;
+        }
+
+        .modal .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e60012;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .settings-menu {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 95%;
+            max-width: 900px;
+            z-index: 300;
+        }
+
+        .settings-menu .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e60012;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .color-button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            color: black;
+            cursor: pointer;
+        }
+
+        .color-button.selected {
+            border: 2px solid yellow;
+        }
+
+        .red {
+            background-color: red;
+            color: white;
+        }
+
+        .green {
+            background-color: green;
+             color: white;
+        }
+
+        .blue {
+            background-color: blue;
+             color: white;
+        }
+
+        .white {
+            background-color: lightgray;
+            color: black;
+        }
+
+        .black {
+            background-color: black;
+            color: white;
+        }
+
+        .black-menu {
+            background-color: black;
+            color: white;
+        }
+
+        .brightness-slider-container {
+            margin-top: 20px;
+        }
+
+        .brightness-slider {
+            width: 100%;
+        }
+
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="background"></div>
+    <div class="controller-status" id="controllerStatus">
+        Controller: Disconnected
+    </div>
+
+    <div class="menu-container" id="mainMenu">
+        <div class="menu-item selected" data-index="0" onclick="handleSelection(0)">🎮 Games Library</div>
+        <div class="menu-item" data-index="1" onclick="handleSelection(1)">🌐 Online</div>
+        <div class="menu-item" data-index="2" onclick="handleSelection(2)">⚙️ Settings</div>
+        <div class="menu-item" data-index="3" onclick="handleSelection(3)">👤 Profile</div>
+    </div>
+
+    <div class="game-library" id="gameLibrary">
+        <div class="close-button" onclick="closeGameLibrary()">Back</div>
+        <h2>Games Library</h2>
+        <div class="menu-item selected" data-index="0" onclick="launchGame('Mario Kart 64.html')">Mario Kart 64</div>
+        <div class="menu-item" data-index="1">GoldenEye 007</div>
+        <div class="menu-item" data-index="2">The Legend of Zelda: Ocarina of Time</div>
+        <div class="menu-item" data-index="3" onclick="launchGame('Mario 64.html')">Mario 64</div>
+        <div class="menu-item" data-index="4" onclick="launchGame('StarFox 64.html')">StarFox 64</div>
+    </div>
+
+    <div class="game-screen" id="gameScreen">
+        <div class="close-button" onclick="closeGame()">Close</div>
+        <iframe id="gameIframe" style="border:0px #ffffff none;" scrolling="no" frameborder="1" width="100%"
+            height="100%" allowfullscreen></iframe>
+    </div>
+
+    <div class="modal" id="onlineModal">
+        <div class="close-button" onclick="closeOnlineModal()">Back</div>
+        <h2>Online</h2>
+        <p>Online not available yet. Please check back later!</p>
+    </div>
+
+    <div class="settings-menu" id="settingsMenu">
+        <div class="close-button" onclick="closeSettingsMenu()">Back</div>
+        <h2>Settings</h2>
+        <p>Select Background Color:</p>
+        <button class="color-button red" data-index="0" onclick="selectColor(0)">Red</button>
+        <button class="color-button green" data-index="1" onclick="selectColor(1)">Green</button>
+        <button class="color-button blue" data-index="2" onclick="selectColor(2)">Blue</button>
+        <button class="color-button white" data-index="3" onclick="selectColor(3)">White</button>
+        <button class="color-button black" data-index="4" onclick="selectColor(4)">Black</button>
+
+        <div class="brightness-slider-container">
+            <p>Adjust Background Brightness:</p>
+            <input type="range" min="0" max="100" value="70" class="brightness-slider" id="brightnessSlider" oninput="setBrightness(this.value)">
+        </div>
+    </div>
+
+    <div class="beta-label">Beta Release 0.2.3</div>
+
+    <script>
+        let selectedIndex = 0;
+        let libSelectedIndex = 0;
+        let settingsSelectedIndex = 0;
+        const mainMenuItems = document.querySelectorAll('#mainMenu .menu-item');
+        const libMenuItems = document.querySelectorAll('#gameLibrary .menu-item');
+        const controllerStatus = document.getElementById('controllerStatus');
+        const gameLibrary = document.getElementById('gameLibrary');
+        const gameScreen = document.getElementById('gameScreen');
+        const gameIframe = document.getElementById('gameIframe');
+        const onlineModal = document.getElementById('onlineModal');
+        const settingsMenu = document.getElementById('settingsMenu');
+        const colorButtons = document.querySelectorAll('.color-button');
+        const brightnessSlider = document.getElementById('brightnessSlider');
+        const menuContainer = document.getElementById('mainMenu');
+        const gameLibraryElement = document.getElementById('gameLibrary');
+        const onlineModalElement = document.getElementById('onlineModal');
+        const settingsMenuElement = document.getElementById('settingsMenu');
+        const backgroundElement = document.getElementById('background');
+        let gamepad = null;
+        let lastButtonPress = 0;
+        let lastFullscreenToggle = 0;
+        let inGame = false; // Track if we are in the game
+        let currentMenuColor = '';
+
+        window.addEventListener('gamepadconnected', (e) => {
+            gamepad = e.gamepad;
+            let controllerName = "Connected";
+            if (gamepad.id.includes("Xbox 360 Controller")) {
+                controllerName = "Xbox 360 Controller";
+            } else if (gamepad.id.includes("Wireless Controller")) {
+                controllerName = "DualSense Wireless Controller";
+            }
+            controllerStatus.textContent = `Controller: ${controllerName}`;
+            requestAnimationFrame(updateController);
+        });
+
+        window.addEventListener('gamepaddisconnected', () => {
+            gamepad = null;
+            controllerStatus.textContent = 'Controller: Disconnected';
+        });
+
+        function toggleFullscreen(element) {
+            if (!document.fullscreenElement) {
+                if (element.requestFullscreen) {
+                    element.requestFullscreen();
+                } else if (element.mozRequestFullScreen) { /* Firefox */
+                    element.mozRequestFullScreen();
+                } else if (element.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                    element.webkitRequestFullscreen();
+                } else if (element.msRequestFullscreen) { /* IE/Edge */
+                    element.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) { /* Firefox */
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE/Edge */
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        function updateController() {
+            if (!gamepad) return;
+
+            const currentGamepad = navigator.getGamepads()[gamepad.index];
+            if (!currentGamepad) return;
+
+            const now = Date.now();
+
+            const isDualsense = gamepad.id.includes("Wireless Controller");
+            const isXbox = gamepad.id.includes("Xbox 360 Controller");
+
+            // Default mappings
+            let fullscreenButton, closeButton, backButton, dpadUp, dpadDown, selectButton, startButton, homeButton, selectBtn;
+
+            if (isXbox) {
+                fullscreenButton = 10; // Left joystick button
+                closeButton = 8; // Menu Button (B in menu)
+                backButton = 1; // B Button (menu)
+                dpadUp = 12;
+                dpadDown = 13;
+                selectButton = 0; // A Button (menu)
+                startButton = 9; // Start button
+                homeButton = 16; // Xbox Home button
+                selectBtn = 8; // Select button
+            } else if (isDualsense) {
+                fullscreenButton = 17; // Touchpad
+                closeButton = 16; // Home
+                backButton = 1; // O
+                dpadUp = 4;
+                dpadDown = 6;
+                selectButton = 0; // X
+                startButton = 9;
+                homeButton = 16;
+                selectBtn = 8;
+            } else {
+                fullscreenButton = 9;
+                closeButton = 8;
+                backButton = 1;
+                dpadUp = 12;
+                dpadDown = 13;
+                selectButton = 0;
+                startButton = 9;
+                homeButton = 16;
+                selectBtn = 8;
+            }
+
+            // --- IN GAME CONTROLS FOR XBOX 360 CONTROLLER ---
+            if (isXbox && gameScreen.style.display === 'block') {
+                // Fullscreen: Left joystick button
+                if (currentGamepad.buttons[fullscreenButton]?.pressed) {
+                    if (now - lastFullscreenToggle > 500) {
+                        toggleFullscreen(gameIframe);
+                        lastFullscreenToggle = now;
+                    }
+                }
+                // Back: Xbox Home button (index 16)
+                if (currentGamepad.buttons[homeButton]?.pressed) {
+                    if (now - lastButtonPress > 500) {
+                        closeGame();
+                        lastButtonPress = now;
+                    }
+                }
+                // Start: Start button (index 9)
+                if (currentGamepad.buttons[startButton]?.pressed) {
+                    if (now - lastButtonPress > 500) {
+                        sendKeyToIframe('Enter');
+                        lastButtonPress = now;
+                    }
+                }
+                // Select: Select button (index 8)
+                if (currentGamepad.buttons[selectBtn]?.pressed) {
+                    if (now - lastButtonPress > 500) {
+                        sendKeyToIframe(' ');
+                        lastButtonPress = now;
+                    }
+                }
+                // Prevent default in-game close/fullscreen logic for Xbox
+                return requestAnimationFrame(updateController);
+            }
+
+            // FULLSCREEN
+            if (gameScreen.style.display === 'block' && currentGamepad.buttons[fullscreenButton]?.pressed) {
+                if (now - lastFullscreenToggle > 500) {
+                    toggleFullscreen(gameIframe);
+                    lastFullscreenToggle = now;
+                }
+            }
+
+            // CLOSE GAME
+            if (gameScreen.style.display === 'block' && currentGamepad.buttons[closeButton]?.pressed) {
+                if (now - lastButtonPress > 500) {
+                    closeGame();
+                    lastButtonPress = now;
+                }
+            }
+
+            if (!inGame) { // Only process menu input if NOT in the game
+                if (now - lastButtonPress > 200) {
+                    const verticalAxis = currentGamepad.axes[1];
+                    const horizontalAxis = currentGamepad.axes[0];
+                    let dpadUpPressed = false;
+                    let dpadDownPressed = false;
+
+                    if (isDualsense) {
+                        const dpadAxis = currentGamepad.axes[9];
+                        dpadUpPressed = dpadAxis < -0.5;
+                        dpadDownPressed = dpadAxis > 0.5;
+                    } else {
+                        dpadUpPressed = currentGamepad.buttons[dpadUp]?.pressed;
+                        dpadDownPressed = currentGamepad.buttons[dpadDown]?.pressed;
+                    }
+
+                    if (settingsMenu.style.display === 'block') {
+                        // Horizontal Axis for Color Selection
+                        if (horizontalAxis < -0.5) {
+                            settingsSelectedIndex = Math.max(0, settingsSelectedIndex - 1);
+                            updateSettingsSelection();
+                            lastButtonPress = now;
+                        }
+                        if (horizontalAxis > 0.5) {
+                            settingsSelectedIndex = Math.min(colorButtons.length - 1, settingsSelectedIndex + 1);
+                            updateSettingsSelection();
+                            lastButtonPress = now;
+                        }
+
+                        // Vertical Axis for Brightness
+                        if (verticalAxis < -0.5) {
+                            let brightness = parseInt(brightnessSlider.value);
+                            brightness = Math.min(100, brightness + 5);
+                            setBrightness(brightness);
+                            brightnessSlider.value = brightness;
+                            lastButtonPress = now;
+                        }
+                        if (verticalAxis > 0.5) {
+                            let brightness = parseInt(brightnessSlider.value);
+                            brightness = Math.max(0, brightness - 5);
+                            setBrightness(brightness);
+                            brightnessSlider.value = brightness;
+                            lastButtonPress = now;
+                        }
+
+                        if (currentGamepad.buttons[selectButton]?.pressed) {
+                            selectColor(settingsSelectedIndex);
+                            lastButtonPress = now;
+                        }
+
+                        // CLOSE MENU: B/O button
+                        if (currentGamepad.buttons[backButton]?.pressed) {
+                            closeSettingsMenu();
+                            lastButtonPress = now;
+                        }
+                    } else if (gameLibrary.style.display === 'block') {
+                        if (verticalAxis < -0.5 || dpadUpPressed) {
+                            libSelectedIndex = Math.max(0, libSelectedIndex - 1);
+                            updateLibSelection();
+                            lastButtonPress = now;
+                        }
+                        if (verticalAxis > 0.5 || dpadDownPressed) {
+                            libSelectedIndex = Math.min(libMenuItems.length - 1, libSelectedIndex + 1);
+                            updateLibSelection();
+                            lastButtonPress = now;
+                        }
+                        if (currentGamepad.buttons[selectButton]?.pressed) {
+                            libMenuItems[libSelectedIndex].click();
+                            lastButtonPress = now;
+                        }
+                        // CLOSE MENU: B/O button
+                        if (currentGamepad.buttons[backButton]?.pressed) {
+                            closeGameLibrary();
+                            lastButtonPress = now;
+                        }
+                    } else if (onlineModal.style.display === 'block') {
+                        // CLOSE MENU: B/O button
+                        if (currentGamepad.buttons[backButton]?.pressed) {
+                            closeOnlineModal();
+                            lastButtonPress = now;
+                        }
+                    } else {
+                        if (verticalAxis < -0.5 || dpadUpPressed) {
+                            selectedIndex = Math.max(0, selectedIndex - 1);
+                            updateSelection();
+                            lastButtonPress = now;
+                        }
+                        if (verticalAxis > 0.5 || dpadDownPressed) {
+                            selectedIndex = Math.min(mainMenuItems.length - 1, selectedIndex + 1);
+                            updateSelection();
+                            lastButtonPress = now;
+                        }
+                        if (currentGamepad.buttons[selectButton]?.pressed) {
+                            handleSelection(selectedIndex);
+                            lastButtonPress = now;
+                        }
+                        if (currentGamepad.buttons[2].pressed) {
+                            openGameLibrary();
+                            lastButtonPress = now;
+                        }
+                    }
+                }
+            }
+
+            requestAnimationFrame(updateController);
+        }
+
+        function updateSelection() {
+            mainMenuItems.forEach((item, index) => {
+                item.classList.toggle('selected', index === selectedIndex);
+            });
+        }
+
+        function updateLibSelection() {
+            libMenuItems.forEach((item, index) => {
+                item.classList.toggle('selected', index === libSelectedIndex);
+            });
+        }
+
+        function updateSettingsSelection() {
+            colorButtons.forEach((button, index) => {
+                button.classList.toggle('selected', index === settingsSelectedIndex);
+            });
+        }
+
+        function handleSelection(index) {
+            if (index === 0) {
+                openGameLibrary();
+            } else if (index === 1) {
+                openOnlineModal();
+            } else if (index === 2) {
+                openSettingsMenu();
+            }
+        }
+
+        function openGameLibrary() {
+            gameLibrary.style.display = 'block';
+            libSelectedIndex = 0;
+            updateLibSelection();
+        }
+
+        function closeGameLibrary() {
+            gameLibrary.style.display = 'none';
+        }
+
+        function launchGame(url) {
+            gameLibrary.style.display = 'none';
+            gameScreen.style.display = 'block';
+            gameIframe.src = url;
+            inGame = true; // Set the inGame flag
+        }
+
+        function closeGame() {
+            gameScreen.style.display = 'none';
+            gameIframe.src = '';
+            inGame = false; // Clear the inGame flag
+        }
+
+        function openOnlineModal() {
+            onlineModal.style.display = 'block';
+        }
+
+        function closeOnlineModal() {
+            onlineModal.style.display = 'none';
+        }
+
+        function openSettingsMenu() {
+            settingsMenu.style.display = 'block';
+            settingsSelectedIndex = 0;
+            updateSettingsSelection();
+        }
+
+        function closeSettingsMenu() {
+            settingsMenu.style.display = 'none';
+        }
+
+        function selectColor(index) {
+            settingsSelectedIndex = index;
+            updateSettingsSelection();
+            setBackgroundColor(colorButtons[index].classList[1], index);
+        }
+
+        function setBackgroundColor(color, index) {
+            backgroundElement.style.backgroundColor = color;
+            settingsSelectedIndex = index;
+            updateSettingsSelection();
+
+            // Apply black menu style when white is selected
+            if (color === 'white') {
+                menuContainer.classList.add('black-menu');
+                gameLibraryElement.classList.add('black-menu');
+                onlineModalElement.classList.add('black-menu');
+                settingsMenuElement.classList.add('black-menu');
+                currentMenuColor = 'black';
+                colorButtons.forEach(button => {
+                    button.style.color = 'white';
+                });
+                document.body.style.color = 'white'; // Ensure text is visible
+            } else {
+                menuContainer.classList.remove('black-menu');
+                gameLibraryElement.classList.remove('black-menu');
+                onlineModalElement.classList.remove('black-menu');
+                settingsMenuElement.classList.remove('black-menu');
+                currentMenuColor = '';
+                colorButtons.forEach(button => {
+                    button.style.color = 'black'; // Ensure text is visible
+                });
+                document.body.style.color = 'white'; // Reset text color
+            }
+        }
+
+        function setBrightness(brightness) {
+            backgroundElement.style.filter = `brightness(${brightness}%)`;
+        }
+
+        // Initial setup
+        backgroundElement.style.backgroundColor = '#e60012';
+        backgroundElement.style.filter = `brightness(70%)`;
+
+        updateSelection();
+
+        // Helper function to send key events to the iframe
+        function sendKeyToIframe(key) {
+            const iframe = document.getElementById('gameIframe');
+            if (!iframe) return;
+            // Try to send a postMessage to the iframe (if supported by the embedded game)
+            iframe.contentWindow.postMessage({ type: 'simulateKey', key }, '*');
+        }
+    </script>
+</body>
+
+</html>
